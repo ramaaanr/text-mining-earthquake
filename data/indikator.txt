@@ -13,6 +13,5 @@ Problem
 
 Alasan:
 - Sulitnya mencari data dengan bukti dikarenakan gempa terjadi pada rentang waktu tertentu sehingga orang yg membuat tweet dengan bukti secara langsung tentang gempa pun berada di rentang waktu tersebut
-
 - Ada batasan dari search tweet sendiri, yang saya dapat hanya 15k tweets, pernah mencoba sekitaran 18k query namun data tersebut ditolak oleh tweets api
 - Terdapat batasan waktu dalam menggunakan search tweets 
