@@ -2,6 +2,7 @@ library(tm)
 library(xlsx)
 library(katadasaR)
 library(textclean)
+
 rm(list = ls())
 
 checkData <- function() {
@@ -56,6 +57,19 @@ corpus.processed <- tm_map(
   content_transformer(cleanHashtag)
 )
 
+# TODO : Menghapus Emoji
+
+replaceEmoji <- function(x) {
+  return(
+    replace_emoji(x)
+  )
+}
+
+corpus.processed <- tm_map(
+  corpus.processed,
+  content_transformer(replaceEmoji)
+)
+
 # TODO : Mengubah Huruf Kecil
 corpus.processed <- tm_map(
   corpus.processed,
@@ -92,7 +106,7 @@ corpus.processed <- tm_map(
 )
 
 # TODO : Replace Slang Words
-spell.lex <- read.csv("data/kamus-slang/colloquial-indonesian-lexicon.csv")
+spell.lex <- read.csv("data/lexicon/combined-lexicon.csv")
 
 replaceSlangWords <- function(x) {
   return(replace_internet_slang(
