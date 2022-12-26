@@ -7,14 +7,14 @@ rm(list = ls())
 
 # TODO 1: Mengambil data
 main_data <- read.csv(
-  "data-results/data_gempa_processed_with_slang_removal - Copy.csv",
+  "data-results/gempa_cleaned.csv",
   stringsAsFactors = FALSE
 )
 
 # TODO 2: menyimpan kedalam corpus
 main_data.corpus <- cbind.data.frame(
   paste0("doc_", c(1:nrow(main_data))),
-  main_data$text
+  main_data$teks
 )
 
 colnames(main_data.corpus) <- c("doc_id", "text")

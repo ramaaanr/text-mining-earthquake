@@ -9,6 +9,7 @@ checkData <- function() {
   print(corpus.processed[["doc_3"]][["content"]])
 }
 
+
 # TODO 1: Membuat File Corpus
 
 main_data <- read.xlsx(
