@@ -1,8 +1,9 @@
 setwd("C:/Users/ASUS/Documents/Programming Project/R/sem5-text-mining/text-mining-earthquake/")
-rm(list = ls())
 
 library(class)
 library(gmodels)
+
+rm(list = ls())
 
 data = read.csv(
   "data-results/data-unigram.csv",
@@ -10,6 +11,7 @@ data = read.csv(
 )
 
 row_labels <- data[, ncol(data)]
+
 
 set.seed(123)
 
@@ -29,7 +31,7 @@ model <- knn(
   train = data_train,
   test = data_test,
   cl = train_labels,
-  k = 3
+  k = 13
 )
 
 ct = CrossTable(
@@ -37,7 +39,10 @@ ct = CrossTable(
   y = model,
   prop.chisq = FALSE
 )
-
 print(ct)
 
-# mode = table("Prections" = knn.prediction, Actual = test_labels)
+
+cm <- table("Predictions" = model, Actual = test_labels)
+accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+acc <- accuracy(cm)
+print(acc)

@@ -1,20 +1,16 @@
+setwd("C:/Users/ASUS/Documents/Programming Project/R/sem5-text-mining/text-mining-earthquake/")
+rm(list = ls())
+
 library(tm)
 library(xlsx)
 library(katadasaR)
 library(textclean)
 
-rm(list = ls())
-
-checkData <- function() {
-  print(corpus.processed[["doc_3"]][["content"]])
-}
-
-
-# TODO 1: Membuat File Corpus
+# TODO : Membuat Corpus
 
 main_data <- read.xlsx(
-  "data/data_gempa_300.xlsx",
-  sheetName = "sheet"
+  "data/data_gempa.xlsx",
+  sheetName = "data"
 )
 
 main_data.corpus <- cbind.data.frame(
@@ -28,10 +24,9 @@ corpus <- VCorpus(DataframeSource(main_data.corpus))
 
 corpus.processed <- corpus
 
-checkData()
 
-# TODO : Menghapus Tag User
-removeUser <- function(x) {
+# TODO : Menghapus Tag User '@'
+removeUser = function(x) {
   return(gsub("@\\w+", "", x))
 }
 corpus.processed <- tm_map(
@@ -39,7 +34,7 @@ corpus.processed <- tm_map(
   content_transformer(removeUser)
 )
 
-# TODO : Menghapus URL
+# TODO : Menghapus URL/Link
 cleanURL <- function(x) {
   return(gsub("(f|ht)tp(s?)://\\S+", "", x, perl = T))
 }
@@ -60,54 +55,35 @@ corpus.processed <- tm_map(
 
 # TODO : Menghapus Emoji
 
-replaceEmoji <- function(x) {
-  return(
-    replace_emoji(x)
-  )
+cleanEmoji <- function(x){
+  return(gsub("[^\x01-\x7F]", "", x))
 }
 
 corpus.processed <- tm_map(
   corpus.processed,
-  content_transformer(replaceEmoji)
+  content_transformer(cleanEmoji)
 )
 
-# TODO : Mengubah Huruf Kecil
+# TODO : Mengubah teks ke huruf kecil
 corpus.processed <- tm_map(
   corpus.processed,
   content_transformer(tolower)
 )
 
-# TODO menghapus tanca baca
+# TODO Menghapus tanda baca
 corpus.processed <- tm_map(
   corpus.processed,
   removePunctuation
 )
 
-# TODO menghapus angka
+# TODO Menghapus Angka
 corpus.processed <- tm_map(
   corpus.processed,
   removeNumbers
 )
 
-# TODO : menghapus stopword
-stopwords.id <- readLines("data/stopword/tala-masdevid.txt")
-corpus.processed <- tm_map(corpus.processed, removeWords, stopwords.id)
-
-# TODO : mengubah ke kata dasar
-getKataDasar <- function(x) {
-  str <- unlist(strsplit(stripWhitespace(x), " "))
-  str <- sapply(str, katadasaR)
-  str <- paste(str, collapse = " ")
-  return(str)
-}
-
-corpus.processed <- tm_map(
-  corpus.processed,
-  content_transformer(getKataDasar)
-)
-
-# TODO : Replace Slang Words
-spell.lex <- read.csv("data/lexicon/combined-lexicon.csv")
+# TODO : Mengubah Slang Word
+spell.lex <- read.csv("data/lexicon/combined-lexicon.csv", row.names = NULL)
 
 replaceSlangWords <- function(x) {
   return(replace_internet_slang(
@@ -123,16 +99,49 @@ corpus.processed <- tm_map(
   content_transformer(replaceSlangWords)
 )
 
+# TODO : Mengubah ke kata dasar
+getKataDasar <- function(x) {
+  str <-unlist(strsplit(stripWhitespace(x), " "))
+  str <- sapply(str, katadasaR)
+  str <- paste(str, collapse = " ")
+  return(str)
+}
 
-# TODO : menghapus spasi berlebih
+corpus.processed <- tm_map(
+  corpus.processed,
+  content_transformer(getKataDasar)
+)
+
+
+# TODO : Menghapus Stopword
+stopwords.id <- readLines("data/stopword/tala-masdevid.txt")
+corpus.processed <- tm_map(
+  corpus.processed,
+  removeWords,
+  stopwords.id
+)
+
+
+# TODO : Menghapus Spasi Berlebih
 corpus.processed <- tm_map(
   corpus.processed,
   stripWhitespace
 )
 
-checkData()
+# TODO : Menghilangkan Spasi diawal
+cleanLeadingWhiteSpace <- function(x) {
+  return(
+    trimws(x)
+  )
+}
 
-# TODO : Menyiman data ke file csv
+corpus.processed <- tm_map(
+  corpus.processed,
+  content_transformer(cleanLeadingWhiteSpace)
+)
+
+
+# TODO : Simpan data
 corpus.df <- data.frame(
   text = unlist(sapply(corpus.processed, "[", "content")),
   stringsAsFactors = FALSE
@@ -143,10 +152,13 @@ main_data.processed <- cbind.data.frame(
   main_data$class_label
 )
 
-colnames(main_data.processed) <- c("text", "class_label")
+View(main_data.processed)
+
+colnames(main_data.processed) = c("text", "class_label")
 
 write.csv(
   main_data.processed,
-  "data-results/data_gempa_processed_with_slang_removal.csv",
+  "data-results/data_gempa_processed.csv",
   row.names = FALSE
 )
+
